@@ -26,11 +26,8 @@ namespace FileMonitorService
                 // the renaming of files or directories.
                 watcher.NotifyFilter = NotifyFilters.LastAccess
                                      | NotifyFilters.LastWrite
-                                     | NotifyFilters.FileName
-                                     | NotifyFilters.DirectoryName;
+                                     | NotifyFilters.FileName;
 
-                // Only watch text files.
-                watcher.Filter = "*.txt";
 
                 // Add event handlers.
                 watcher.Changed += OnChanged;
@@ -40,12 +37,14 @@ namespace FileMonitorService
 
                 // Begin watching.
                 watcher.EnableRaisingEvents = true;
+
+                while (true) ;
             }
         }
         private void OnChanged(object source, FileSystemEventArgs e) =>
-        _logger.LogInformation($"File: {e.FullPath} {e.ChangeType}");
+        _logger.LogInformation($"File {e.ChangeType}: {e.FullPath}");
 
         private void OnRenamed(object source, RenamedEventArgs e) =>
-        _logger.LogInformation($"File: {e.FullPath} {e.ChangeType}");
+        _logger.LogInformation($"File {e.ChangeType}: {e.OldFullPath} -> {e.FullPath}");
     }
 }

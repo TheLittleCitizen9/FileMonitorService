@@ -16,17 +16,36 @@ namespace FileMonitorService
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", Serilog.Events.LogEventLevel.Warning)
                 .Enrich.FromLogContext()
-                .WriteTo.File(@"C:\temp\LogFile.txt")
+                .WriteTo.File(@"C:\DarTemp\LogFile.txt")
                 .CreateLogger();
 
-            CreateHostBuilder(args).Build().Run();
+            try
+            {
+                Log.Information("Starting the service");
+                CreateHostBuilder(args).Build().Run();
+                return;
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "There was a problem starting the service");
+                return;
+            }
+            finally
+            {
+                Log.Information("Service closed");
+                Log.CloseAndFlush();
+            }
         }
 
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddHostedService<Worker>();
-                });
+                })
+            .UseSerilog();
+        }
+            
     }
 }

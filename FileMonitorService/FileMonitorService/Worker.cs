@@ -12,7 +12,7 @@ namespace FileMonitorService
     {
         private readonly ILogger<Worker> _logger;
         private FilesWatcher _filesWatcher;
-        private const string PATH = @"C:\temp\FilesToListen";
+        private const string PATH = @"C:\DarTemp\FilesToListen";
 
         public Worker(ILogger<Worker> logger)
         {
@@ -36,7 +36,14 @@ namespace FileMonitorService
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                _filesWatcher.WatchFiles();
+                try
+                {
+                    _filesWatcher.WatchFiles();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "There was an ERROR");
+                }
                 await Task.Delay(1000, stoppingToken);
             }
         }
