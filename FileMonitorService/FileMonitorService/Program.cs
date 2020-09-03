@@ -19,7 +19,6 @@ namespace FileMonitorService
 
             try
             {
-                Log.Information("Starting the service");
                 CreateHostBuilder(args).Build().Run();
                 return;
             }

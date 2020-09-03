@@ -24,7 +24,8 @@ namespace FileMonitorService
 
                 watcher.NotifyFilter = NotifyFilters.LastAccess
                                      | NotifyFilters.LastWrite
-                                     | NotifyFilters.FileName;
+                                     | NotifyFilters.FileName
+                                     | NotifyFilters.DirectoryName;
 
 
                 watcher.Changed += OnChanged;
