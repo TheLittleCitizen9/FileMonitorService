@@ -10,12 +10,11 @@ namespace FileMonitorService
     {
         private readonly ILogger<Worker> _logger;
         private FilesWatcher _filesWatcher;
-        private const string PATH = @"C:\DarTemp\FilesToListen";
 
         public Worker(ILogger<Worker> logger)
         {
             _logger = logger;
-            _filesWatcher = new FilesWatcher(PATH, _logger);
+            _filesWatcher = new FilesWatcher(_logger);
         }
 
         public override Task StartAsync(CancellationToken cancellationToken)

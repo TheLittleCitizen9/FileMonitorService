@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.IO;
 
 namespace FileMonitorService
@@ -7,10 +8,12 @@ namespace FileMonitorService
     {
         private string _path;
         private ILogger<Worker> _logger;
+        private IConfigurationRoot _configuration;
 
-        public FilesWatcher(string path, ILogger<Worker> logger)
+        public FilesWatcher(ILogger<Worker> logger)
         {
-            _path = path;
+            CreateConfiguration();
+            _path = _configuration.GetSection("Path").Value;
             _logger = logger;
         }
         public void WatchFiles()
@@ -19,20 +22,16 @@ namespace FileMonitorService
             {
                 watcher.Path = _path;
 
-                // Watch for changes in LastAccess and LastWrite times, and
-                // the renaming of files or directories.
                 watcher.NotifyFilter = NotifyFilters.LastAccess
                                      | NotifyFilters.LastWrite
                                      | NotifyFilters.FileName;
 
 
-                // Add event handlers.
                 watcher.Changed += OnChanged;
                 watcher.Created += OnChanged;
                 watcher.Deleted += OnChanged;
                 watcher.Renamed += OnRenamed;
 
-                // Begin watching.
                 watcher.EnableRaisingEvents = true;
 
                 while (true) ;
@@ -43,5 +42,12 @@ namespace FileMonitorService
 
         private void OnRenamed(object source, RenamedEventArgs e) =>
         _logger.LogInformation($"File {e.ChangeType}: {e.OldFullPath} -> {e.FullPath}");
+
+        private void CreateConfiguration()
+        {
+            _configuration = new ConfigurationBuilder().SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json")
+            .Build();
+        }
     }
 }
